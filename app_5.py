@@ -1,3 +1,4 @@
+import streamlit as st
 from langchain_openai import OpenAIEmbeddings
 from langchain_openai import ChatOpenAI
 from langchain_community.vectorstores import AstraDB
@@ -39,7 +40,8 @@ def load_retriever():
         embedding=OpenAIEmbeddings(),
         collection_name="my_store",
         api_endpoint=st.secrets['ASTRA_API_ENDPOINT'],
-        token=st.secrets['ASTRA_TOKEN']
+        token=st.secrets['ASTRA_TOKEN'],
+        namespace="default_keyspace"
     )
 
     # Get the retriever for the Chat Model

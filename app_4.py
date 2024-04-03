@@ -9,7 +9,7 @@ from langchain.prompts import ChatPromptTemplate
 @st.cache_data()
 def load_prompt():
     template = """You're a helpful AI assistent tasked to answer the user's questions.
-You're friendly and you answer extensively with multiple sentences. You prefer to use bulletpoints to summarize.
+You're friendly and you answer extensively with multiple sentences. You prefer to use * to summarize.
 
 QUESTION:
 {question}

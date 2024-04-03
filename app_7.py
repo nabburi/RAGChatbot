@@ -10,6 +10,7 @@ from langchain.prompts import ChatPromptTemplate
 from langchain.callbacks.base import BaseCallbackHandler
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import PyPDFLoader
+from langchain.agents import load_tools, initialize_agent
 
 # Streaming call back handler for responses
 class StreamHandler(BaseCallbackHandler):
@@ -98,6 +99,16 @@ def load_retriever():
     return retriever
 retriever = load_retriever()
 
+# search google for results not found in database
+@st.cache_resource(show_spinner='searching internet for results not found in database ...')
+def load_internet():
+    tool_names = ['serpapi']
+    tools = load_tools(tool_names)
+    agent = initialize_agent(tools, chat_model, agent='zero-shot-react-description', verbose=True)
+    #agent.run(questions)
+    return agent
+agent = load_internet()
+
 # Start with empty messages, stored in session state
 if 'messages' not in st.session_state:
     st.session_state.messages = []
@@ -135,7 +146,7 @@ if question := st.chat_input("What's up?"):
 
     # Generate the answer by calling OpenAI's Chat Model
     inputs = RunnableMap({
-        'context': lambda x: retriever.get_relevant_documents(x['question']),
+        'context': lambda x: (retriever.get_relevant_documents(x['question']), agent.run(x['question'])),
         'question': lambda x: x['question']
     })
     chain = inputs | prompt | chat_model
